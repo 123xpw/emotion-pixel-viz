@@ -1,0 +1,57 @@
+# 密钥与凭证
+.env
+.github_token
+service_account.json
+credentials.json
+token.pickle
+
+# 私人日记原文（不公开）
+data/diaries.txt
+data/human_summaries.txt
+
+# 从私人日记提取的中间产物
+outputs/emotions.json
+outputs/emotion_audit.json
+outputs/emotion_audit_review.md
+outputs/main_prompts.json
+outputs/english_prompts.json
+outputs/partial_prompts.json
+outputs/baseline_english.json
+outputs/greedy_prompts.json
+outputs/greedy_english_prompts.json
+outputs/answer_key.json
+
+# 含日记内容的 prompt 文件
+prompts/baseline/
+prompts/full/
+
+# 实验草稿与中间目录
+outputs/gpt_generate/
+outputs/main_experiment/
+outputs/upload_to_drive/
+outputs/figure_1_motivation/
+outputs/figure_2_density_paradox/
+outputs/imgur_urls.json
+outputs/form_links.json
+outputs/google_form_draft.md
+outputs/survey_qrcode.png
+
+# 内部规划文档
+EXECUTION_PLAN.md
+LORA_TRAINING_PLAN.md
+PROJECT_REFLECTION.md
+.claude/
+
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# IDE
+.idea/
+.vscode/
+.DS_Store
