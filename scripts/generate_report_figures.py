@@ -1,7 +1,8 @@
 """
 生成报告配图，所有数据均来自实测结果（clip_scores.csv + 真实生成图像）。
 产出：
-  outputs/figure_condition_comparison.png  —— diary_1 三条件并排对比（含 CLIP 分）
+  outputs/figure_pipeline.png              —— 系统架构图
+  outputs/figure_condition_comparison.png  —— diary_5 三条件并排对比（含 CLIP 分）
   outputs/figure_clip_heatmap.png          —— 10篇日记 × 3条件 CLIP 分热力图
 """
 
@@ -10,7 +11,19 @@ from pathlib import Path
 from PIL import Image
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
+import matplotlib.patheffects as pe
+from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
+import matplotlib
 import numpy as np
+
+# macOS 中文字体支持
+for _font in ["STHeiti", "Hiragino Sans GB", "Arial Unicode MS"]:
+    try:
+        matplotlib.rcParams["font.family"] = _font
+        break
+    except Exception:
+        continue
+matplotlib.rcParams["axes.unicode_minus"] = False
 
 BASE_DIR = Path(__file__).parent.parent
 OUTPUTS = BASE_DIR / "outputs"
@@ -28,8 +41,90 @@ def load_clip_scores():
     return scores
 
 
-# ── Figure 1：diary_1 三条件并排 ──────────────────────────────────
-def make_condition_comparison(scores, diary_id="diary_1"):
+# ── Figure 0：系统架构图 ──────────────────────────────────────────
+def make_pipeline_diagram():
+    fig, ax = plt.subplots(figsize=(10, 7))
+    ax.set_xlim(0, 10)
+    ax.set_ylim(0, 10)
+    ax.axis("off")
+
+    def box(cx, cy, w, h, label, sublabel="", color="#4472c4", fontsize=10):
+        rect = FancyBboxPatch(
+            (cx - w / 2, cy - h / 2), w, h,
+            boxstyle="round,pad=0.12", linewidth=1.5,
+            edgecolor=color, facecolor=color + "22"
+        )
+        ax.add_patch(rect)
+        ax.text(cx, cy + (0.18 if sublabel else 0), label,
+                ha="center", va="center", fontsize=fontsize,
+                fontweight="bold", color=color)
+        if sublabel:
+            ax.text(cx, cy - 0.28, sublabel,
+                    ha="center", va="center", fontsize=8, color="#555555")
+
+    def arrow(x1, y1, x2, y2, color="#555555"):
+        ax.annotate("", xy=(x2, y2), xytext=(x1, y1),
+                    arrowprops=dict(arrowstyle="-|>", color=color,
+                                   lw=1.5, mutation_scale=14))
+
+    # ── 主干 ──────────────────────────────────────────────────────
+    box(5, 9.2, 3.8, 0.9, "Chinese Diary Input",
+        "中文日记（非结构化文本）", "#2e75b6", fontsize=10)
+
+    arrow(5, 8.75, 5, 8.0)
+
+    box(5, 7.55, 3.8, 0.85, "DeepSeek-Chat  /  Emotion Extraction",
+        "valence · arousal · core metaphor · scene · color palette", "#2e75b6", fontsize=9.5)
+
+    arrow(5, 7.12, 5, 6.4)
+
+    box(5, 5.95, 3.8, 0.85, "Human Audit Gate",
+        "emotion_audit.json  ·  验证通过后方可下游推进", "#7030a0", fontsize=9.5)
+
+    # 审计通过 → 分叉
+    arrow(5, 5.52, 5, 4.85)
+
+    # 分叉横线
+    ax.plot([1.6, 8.4], [4.6, 4.6], color="#888888", lw=1.2, ls="--")
+
+    # ── 三条件分支 ────────────────────────────────────────────────
+    branch_xs = [1.6, 5.0, 8.4]
+    branch_labels = [
+        ("Baseline", "Raw diary → translate\n+ pixel style"),
+        ("Partial", "Emotion labels\n+ valence / arousal"),
+        ("Full", "Core metaphor\n+ scene + color\n+ composition"),
+    ]
+    branch_colors = ["#5b9bd5", "#ed7d31", "#70ad47"]
+
+    for bx, (bl, bsub), bc in zip(branch_xs, branch_labels, branch_colors):
+        arrow(bx, 4.6, bx, 3.85)
+        box(bx, 3.35, 2.55, 0.95, bl, bsub, bc, fontsize=9)
+
+    # 三分支汇合 → 图像生成
+    for bx in branch_xs:
+        arrow(bx, 2.88, bx, 2.3)
+    ax.plot([1.6, 8.4], [2.3, 2.3], color="#888888", lw=1.2, ls="--")
+    arrow(5, 2.3, 5, 1.85)
+
+    box(5, 1.45, 4.2, 0.75, "ChatGPT Images 2.0  (gpt-image-2)",
+        "像素艺术图像生成  ·  30 张（10 diaries × 3 conditions）", "#c55a11", fontsize=9.5)
+
+    arrow(5, 1.08, 5, 0.55)
+
+    box(5, 0.25, 3.8, 0.55, "CLIP ViT-B/32  Evaluation",
+        "cosine similarity  ·  图文情绪对齐评分", "#538135", fontsize=9.5)
+
+    fig.suptitle("System Architecture: NLP-Mediated Pixel Art Emotion Visualization",
+                 fontsize=12, fontweight="bold", y=0.99)
+
+    out = OUTPUTS / "figure_pipeline.png"
+    plt.savefig(out, dpi=150, bbox_inches="tight")
+    plt.close()
+    print(f"✓ 保存：{out}")
+
+
+# ── Figure 1：三条件并排 ──────────────────────────────────────────
+def make_condition_comparison(scores, diary_id="diary_5"):
     fig, axes = plt.subplots(1, 3, figsize=(12, 5))
     fig.suptitle(
         f"Three-Condition Comparison — {diary_id}\n"
@@ -108,6 +203,7 @@ def make_clip_heatmap(scores):
 
 if __name__ == "__main__":
     scores = load_clip_scores()
-    make_condition_comparison(scores, diary_id="diary_1")
+    make_pipeline_diagram()
+    make_condition_comparison(scores, diary_id="diary_5")
     make_clip_heatmap(scores)
     print("\n完成。请检查 outputs/ 目录。")
