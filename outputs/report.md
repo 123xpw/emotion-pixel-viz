@@ -104,4 +104,4 @@
 
 ---
 
-*配图生成脚本：`scripts/generate_report_figures.py`；CLIP 评估脚本：`scripts/evaluate_clip.py`；原始数据：`outputs/clip_scores.csv`。*
+*项目代码与数据：[https://github.com/123xpw/emotion-pixel-viz](https://github.com/123xpw/emotion-pixel-viz)（含配图生成脚本、CLIP 评估脚本及原始数据 `clip_scores.csv`）。*
