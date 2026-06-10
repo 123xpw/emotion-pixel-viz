@@ -36,9 +36,9 @@
 - Full > Partial：10 篇中 9 篇
 - **核心发现**：Partial 垫底——抽象情绪标签缺乏视觉锚点，Full 提供的隐喻和色彩信息对图像情绪传达有帮助，但优势幅度有限（+2.5%）
 
-### 三条件对比（diary_1）
+### 三条件生成结果对比（diary_5 / 7 / 9 / 10）
 
-![三条件对比](outputs/figure_condition_comparison.png)
+![三条件对比 Gallery](outputs/figure_qualitative_gallery.png)
 
 ### CLIP 分数热力图（10 × 3）
 
@@ -137,14 +137,15 @@ scripts/
 prompts/
   emotion_extraction_prompt.txt  DeepSeek 系统 prompt
 outputs/
-  report.md                研究报告（中文，1620 字）
-  clip_scores.csv          实验数据
-  figure_condition_comparison.png
-  figure_clip_heatmap.png
-  clip_analysis.png
-  condition_baseline/      Baseline 条件生成图（10 张）
-  condition_partial/       Partial 条件生成图（10 张）
-  condition_full/          Full 条件生成图（10 张）
+  clip_scores.csv              实验数据
+  gpt-architecture.png         系统架构图（图1）
+  figure_qualitative_gallery.png  三条件生成对比 Gallery（图2）
+  figure_clip_heatmap.png      CLIP 分数热力图（图3）
+  figure_clip_delta.png/svg    ΔCLIP 消融效果图（图4）
+  clip_analysis.png            条件均值与逐日折线
+  condition_baseline/          Baseline 条件生成图（10 张）
+  condition_partial/           Partial 条件生成图（10 张）
+  condition_full/              Full 条件生成图（10 张）
 ```
 
 ---
